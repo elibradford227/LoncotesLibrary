@@ -5,11 +5,11 @@ public class Checkout
 {
   public int Id { get; set; }
   [Required]
-  public string MaterialId { get; set; }
+  public int MaterialId { get; set; }
   [Required]
   public Material Material { get; set; }
   [Required]
-  public string PatronId { get; set; }
+  public int PatronId { get; set; }
   [Required]
   public Patron Patron { get; set; }
   [Required]
