@@ -4,11 +4,14 @@ using System.Text.Json.Serialization;
 using System.Web;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Json;
+using AutoMapper;
+using AutoMapper.QueryableExtensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+builder.Services.AddAutoMapper(typeof(AutoMapperProfiles));
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -28,15 +31,29 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.MapGet("/api/materials", async (LoncotesLibraryDbContext db, HttpContext httpContext) => 
+app.MapGet("/api/materials/available", (LoncotesLibraryDbContext db) =>
+{
+    return db.Materials
+    .Where(m => m.OutOfCirculationSince == null)
+    .Where(m => m.Checkouts.All(co => co.ReturnDate != null))
+    .Select(material => new MaterialDTO
+    {
+        Id = material.Id,
+        MaterialName = material.MaterialName,
+        MaterialTypeId = material.MaterialTypeId,
+        GenreId = material.GenreId,
+        OutOfCirculationSince = material.OutOfCirculationSince
+    })
+    .ToList();
+});
+
+app.MapGet("/api/materials", async (IMapper mapper, LoncotesLibraryDbContext db, HttpContext httpContext) => 
 {
     string materialParam = httpContext.Request.Query["materialType"];
     string genreParam = httpContext.Request.Query["genreParam"];
 
     var query = db.Materials
         .Where(m => m.OutOfCirculationSince == null)
-        .Include(c => c.MaterialType)
-        .Include(g => g.Genre)
         .AsQueryable();
     
     if (materialParam != null && int.TryParse(materialParam, out int materialTypeId))
@@ -49,70 +66,56 @@ app.MapGet("/api/materials", async (LoncotesLibraryDbContext db, HttpContext htt
         query = query.Where(m => m.GenreId == genreId);
     }
 
-    var materials = await query
-        .Select(c => new MaterialDTO
-        {
-            Id = c.Id,
-            MaterialName = c.MaterialName,
-            MaterialTypeId = c.MaterialTypeId,
-            MaterialType = new MaterialTypeDTO
-            {
-                Id = c.MaterialType.Id,
-                Name = c.MaterialType.Name,
-                CheckoutDays = c.MaterialType.CheckoutDays,
-            },
-            GenreId = c.GenreId,
-            Genre = new GenreDTO
-            {
-                Id = c.Genre.Id,
-                Name = c.Genre.Name
-            }
-        }).ToListAsync();
+    var materials = await query.ProjectTo<MaterialDTO>(mapper.ConfigurationProvider).ToListAsync();
 
     return materials;
 });
 
-app.MapGet("/api/materials/{id}", async (LoncotesLibraryDbContext db, int id, HttpContext httpContext) => 
+app.MapGet("/api/materials/{id}", async (IMapper mapper, LoncotesLibraryDbContext db, int id, HttpContext httpContext) => 
 {       
-    return db.Materials
-        .Include(c => c.MaterialType)
-        .Include(g => g.Genre)
-        .Include(c => c.Checkouts)
-        .ThenInclude(p => p.Patron)
-        .Select(c => new MaterialDTO
-            {
-                Id = c.Id,
-                MaterialName = c.MaterialName,
-                MaterialTypeId = c.MaterialTypeId,
-                MaterialType = new MaterialTypeDTO
-                {
-                    Id = c.MaterialType.Id,
-                    Name = c.MaterialType.Name,
-                    CheckoutDays = c.MaterialType.CheckoutDays,
-                },
-                GenreId = c.GenreId,
-                Genre = new GenreDTO
-                {
-                    Id = c.Genre.Id,
-                    Name = c.Genre.Name
-                },
-                Checkouts = c.Checkouts.Select(ch => new CheckoutDTO
-                {
-                    Id = ch.Id,
-                    PatronId = ch.PatronId,
-                    Patron = new PatronDTO 
-                    {
-                        Id = ch.Patron.Id,
-                        FirstName = ch.Patron.FirstName,
-                        LastName = ch.Patron.LastName,
-                        Address = ch.Patron.Address,
-                        Email = ch.Patron.Email,
-                        isActive = ch.Patron.isActive
-                    },
-                    CheckoutDate = ch.CheckoutDate,
-                    ReturnDate = ch.ReturnDate
-                }).ToList()
-            }).Single(c => c.Id == id);
+    var material = db.Materials.ProjectTo<MaterialDTO>(mapper.ConfigurationProvider)
+    .SingleOrDefault(m => m.Id == id);
+
+    return material != null ? Results.Ok(material) : Results.NotFound();
+    // return db.Materials
+    //     .Include(c => c.MaterialType)
+    //     .Include(g => g.Genre)
+    //     .Include(c => c.Checkouts)
+    //     .ThenInclude(p => p.Patron)
+    //     .Select(c => new MaterialDTO
+    //         {
+    //             Id = c.Id,
+    //             MaterialName = c.MaterialName,
+    //             MaterialTypeId = c.MaterialTypeId,
+    //             MaterialType = new MaterialTypeDTO
+    //             {
+    //                 Id = c.MaterialType.Id,
+    //                 Name = c.MaterialType.Name,
+    //                 CheckoutDays = c.MaterialType.CheckoutDays,
+    //             },
+    //             GenreId = c.GenreId,
+    //             Genre = new GenreDTO
+    //             {
+    //                 Id = c.Genre.Id,
+    //                 Name = c.Genre.Name
+    //             },
+    //             Checkouts = c.Checkouts.Select(ch => new CheckoutDTO
+    //             {
+    //                 Id = ch.Id,
+    //                 PatronId = ch.PatronId,
+    //                 Patron = new PatronDTO 
+    //                 {
+    //                     Id = ch.Patron.Id,
+    //                     FirstName = ch.Patron.FirstName,
+    //                     LastName = ch.Patron.LastName,
+    //                     Address = ch.Patron.Address,
+    //                     Email = ch.Patron.Email,
+    //                     isActive = ch.Patron.isActive
+    //                 },
+    //                 CheckoutDate = ch.CheckoutDate,
+    //                 ReturnDate = ch.ReturnDate
+    //             }).ToList()
+    //         }).Single(c => c.Id == id);
 });
 
 app.MapPost("/api/materials", (LoncotesLibraryDbContext db, Material material) =>
@@ -136,36 +139,16 @@ app.MapPut("/api/materials/{id}", (LoncotesLibraryDbContext db, Material materia
     return Results.NoContent();
 });
 
-app.MapGet("/api/materialTypes", async (LoncotesLibraryDbContext db, HttpContext httpContext) => {
-    return db.MaterialTypes
-        .Select(c => new MaterialTypeDTO
-        {
-            Id = c.Id,
-            Name = c.Name,
-            CheckoutDays = c.CheckoutDays,
-        });
+app.MapGet("/api/materialTypes", async (LoncotesLibraryDbContext db, IMapper mapper) => {
+    return db.MaterialTypes.ProjectTo<MaterialTypeDTO>(mapper.ConfigurationProvider).ToList();
 });
 
-app.MapGet("/api/genres", async (LoncotesLibraryDbContext db, HttpContext httpContext) => {
-    return db.Genres
-        .Select(c => new GenreDTO
-        {
-            Id = c.Id,
-            Name = c.Name
-        });
+app.MapGet("/api/genres", async (LoncotesLibraryDbContext db, IMapper mapper) => {
+    return db.Genres.ProjectTo<GenreDTO>(mapper.ConfigurationProvider).ToList();
 });
 
-app.MapGet("/api/patrons", async (LoncotesLibraryDbContext db, HttpContext httpContext) => {
-    return db.Patrons
-        .Select(ch => new PatronDTO
-        {
-            Id = ch.Id,
-            FirstName = ch.FirstName,
-            LastName = ch.LastName,
-            Address = ch.Address,
-            Email = ch.Email,
-            isActive = ch.isActive
-        });
+app.MapGet("/api/patrons", async (LoncotesLibraryDbContext db, IMapper mapper) => {
+    return db.Patrons.ProjectTo<PatronDTO>(mapper.ConfigurationProvider).ToList();
 });
 
 app.MapPut("/api/patrons/updateEmail/{id}", (LoncotesLibraryDbContext db, Patron patron, int id) =>
@@ -217,5 +200,7 @@ app.MapPut("/api/checkouts/{id}", (LoncotesLibraryDbContext db, int id) =>
     db.SaveChanges();
     return Results.Ok(checkoutToUpdate);
 });
+
+
 
 app.Run();
