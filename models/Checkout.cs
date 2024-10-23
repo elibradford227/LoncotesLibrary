@@ -14,5 +14,5 @@ public class Checkout
   public Patron Patron { get; set; }
   [Required]
   public DateTime CheckoutDate { get; set; }
-  public DateTime ReturnDate { get; set; }
+  public DateTime? ReturnDate { get; set; }
 }
