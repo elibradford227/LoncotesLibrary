@@ -11,7 +11,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace LoncotesLibrary.Migrations
 {
     [DbContext(typeof(LoncotesLibraryDbContext))]
-    [Migration("20241019023541_InitialCreate")]
+    [Migration("20241023004446_InitialCreate")]
     partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -148,7 +148,7 @@ namespace LoncotesLibrary.Migrations
                             GenreId = 3,
                             MaterialName = "The Da Vinci Code",
                             MaterialTypeId = 1,
-                            OutOfCirculationSince = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                            OutOfCirculationSince = new DateTime(2011, 6, 10, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
                         {
@@ -164,7 +164,7 @@ namespace LoncotesLibrary.Migrations
                             GenreId = 5,
                             MaterialName = "IT",
                             MaterialTypeId = 1,
-                            OutOfCirculationSince = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                            OutOfCirculationSince = new DateTime(2013, 10, 2, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
                         {
