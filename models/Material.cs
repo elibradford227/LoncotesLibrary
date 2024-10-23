@@ -13,4 +13,6 @@ public class Material
   public int GenreId { get; set; }
   public Genre Genre { get; set; }
   public DateTime? OutOfCirculationSince { get; set; }
+
+  public virtual ICollection<Checkout> Checkouts { get; set; }
 }
