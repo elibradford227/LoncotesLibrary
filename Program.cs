@@ -26,4 +26,30 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.MapGet("/api/materials", (LoncotesLibraryDbContext db) => 
+{
+    return db.Materials
+    .Where(m => m.OutOfCirculationSince == null)
+    .Include(c => c.MaterialType)
+    .Include(g => g.Genre)
+    .Select(c => new MaterialDTO
+    {
+        Id = c.Id,
+        MaterialName = c.MaterialName,
+        MaterialTypeId = c.MaterialTypeId,
+        MaterialType = new MaterialTypeDTO
+        {
+            Id = c.MaterialType.Id,
+            Name = c.MaterialType.Name,
+            CheckoutDays = c.MaterialType.CheckoutDays,
+        },
+        GenreId = c.GenreId,
+        Genre = new GenreDTO
+        {
+            Id = c.Genre.Id,
+            Name = c.Genre.Name
+        }
+    }).ToList();
+});
+
 app.Run();

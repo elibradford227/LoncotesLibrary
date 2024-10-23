@@ -148,9 +148,9 @@ namespace LoncotesLibrary.Migrations
                 {
                     { 1, 1, "Dune", 1, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
                     { 2, 2, "The Hobbit", 1, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 3, 3, "The Da Vinci Code", 1, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
+                    { 3, 3, "The Da Vinci Code", 1, new DateTime(2011, 6, 10, 0, 0, 0, 0, DateTimeKind.Unspecified) },
                     { 4, 4, "Twilight", 1, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 5, 5, "IT", 1, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
+                    { 5, 5, "IT", 1, new DateTime(2013, 10, 2, 0, 0, 0, 0, DateTimeKind.Unspecified) },
                     { 6, 2, "Abbey Road", 2, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
                     { 7, 1, "The Dark Side of the Moon", 2, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
                     { 8, 2, "The Witcher 3", 3, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },

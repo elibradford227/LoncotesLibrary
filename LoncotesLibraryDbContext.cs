@@ -40,18 +40,18 @@ public class LoncotesLibraryDbContext : DbContext
 
       modelBuilder.Entity<Material>().HasData(new Material[]
       {
-          new Material { Id = 1, MaterialName = "Dune", MaterialTypeId = 1, GenreId = 1, OutOfCirculationSince = DateTime.MinValue }, 
-          new Material { Id = 2, MaterialName = "The Hobbit", MaterialTypeId = 1, GenreId = 2, OutOfCirculationSince = DateTime.MinValue }, 
-          new Material { Id = 3, MaterialName = "The Da Vinci Code", MaterialTypeId = 1, GenreId = 3, OutOfCirculationSince = DateTime.MinValue }, 
-          new Material { Id = 4, MaterialName = "Twilight", MaterialTypeId = 1, GenreId = 4, OutOfCirculationSince = DateTime.MinValue }, 
-          new Material { Id = 5, MaterialName = "IT", MaterialTypeId = 1, GenreId = 5, OutOfCirculationSince = DateTime.MinValue }, 
+          new Material { Id = 1, MaterialName = "Dune", MaterialTypeId = 1, GenreId = 1 }, 
+          new Material { Id = 2, MaterialName = "The Hobbit", MaterialTypeId = 1, GenreId = 2 }, 
+          new Material { Id = 3, MaterialName = "The Da Vinci Code", MaterialTypeId = 1, GenreId = 3, OutOfCirculationSince = new DateTime(2011, 6, 10) }, 
+          new Material { Id = 4, MaterialName = "Twilight", MaterialTypeId = 1, GenreId = 4 }, 
+          new Material { Id = 5, MaterialName = "IT", MaterialTypeId = 1, GenreId = 5, OutOfCirculationSince = new DateTime(2013, 10, 02) }, 
           
-          new Material { Id = 6, MaterialName = "Abbey Road", MaterialTypeId = 2, GenreId = 2, OutOfCirculationSince = DateTime.MinValue }, 
-          new Material { Id = 7, MaterialName = "The Dark Side of the Moon", MaterialTypeId = 2, GenreId = 1, OutOfCirculationSince = DateTime.MinValue }, 
+          new Material { Id = 6, MaterialName = "Abbey Road", MaterialTypeId = 2, GenreId = 2 }, 
+          new Material { Id = 7, MaterialName = "The Dark Side of the Moon", MaterialTypeId = 2, GenreId = 1 }, 
           
-          new Material { Id = 8, MaterialName = "The Witcher 3", MaterialTypeId = 3, GenreId = 2, OutOfCirculationSince = DateTime.MinValue }, 
-          new Material { Id = 9, MaterialName = "L.A. Noire", MaterialTypeId = 3, GenreId = 3, OutOfCirculationSince = DateTime.MinValue }, 
-          new Material { Id = 10, MaterialName = "Resident Evil", MaterialTypeId = 3, GenreId = 5, OutOfCirculationSince = DateTime.MinValue }
+          new Material { Id = 8, MaterialName = "The Witcher 3", MaterialTypeId = 3, GenreId = 2 }, 
+          new Material { Id = 9, MaterialName = "L.A. Noire", MaterialTypeId = 3, GenreId = 3 }, 
+          new Material { Id = 10, MaterialName = "Resident Evil", MaterialTypeId = 3, GenreId = 5 }
         });
   }
 }
